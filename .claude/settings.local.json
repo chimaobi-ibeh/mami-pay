@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e \"const p = require\\(''/c/Users/user/Desktop/mami-pay/backend/package.json''\\); console.log\\(JSON.stringify\\(p.scripts, null, 2\\)\\)\")",
+      "Bash(python3 -c \"import json; d=json.load\\(open\\(''C:/Users/user/Desktop/mami-pay/backend/package.json''\\)\\); print\\(json.dumps\\(d.get\\(''scripts'',{}\\), indent=2\\)\\); print\\(''main:'', d.get\\(''main'',''''\\)\\)\")",
+      "Bash(powershell -Command \"Get-Content ''C:\\\\Users\\\\user\\\\Desktop\\\\mami-pay\\\\backend\\\\package.json''\")",
+      "Bash(powershell -Command \"Get-Content ''C:\\\\Users\\\\user\\\\Desktop\\\\mami-pay\\\\backend\\\\server.js''\")",
+      "Bash(powershell -Command \"Get-ChildItem ''C:\\\\Users\\\\user\\\\Desktop\\\\mami-pay\\\\backend'' | Select-Object Name\")",
+      "Bash(powershell -Command \"Get-Content ''C:\\\\Users\\\\user\\\\Desktop\\\\mami-pay\\\\backend\\\\src\\\\app.js''\")",
+      "Bash(powershell -Command \"Get-Content ''C:\\\\Users\\\\user\\\\Desktop\\\\mami-pay\\\\backend\\\\package''\")",
+      "Bash(powershell -Command \"Get-ChildItem ''C:\\\\Users\\\\user\\\\Desktop\\\\mami-pay\\\\backend\\\\src'' -Recurse | Where-Object {-not $_.PSIsContainer} | Select-Object Name\")",
+      "Bash(gh auth status)",
+      "Bash(node --version)",
+      "Bash(npm --version)"
+    ]
+  }
+}

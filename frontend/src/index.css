@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #075f47;
+  --secondary: #ffffff;
+}
+
+body {
+  @apply bg-gray-50 text-gray-900;
+}
+
+.btn-primary {
+  @apply bg-[#075f47] text-white px-4 py-2 rounded-lg hover:bg-[#064e3b] transition-colors;
+}
+
+.card {
+  @apply bg-white p-6 rounded-xl shadow-sm border border-gray-100;
+}
