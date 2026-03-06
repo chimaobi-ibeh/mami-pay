@@ -18,9 +18,13 @@ const registerSchema = Joi.object({
   lastName: Joi.string().required(),
   email: Joi.string().email().required(),
   password: Joi.string().min(6).required(),
-  role: Joi.string().valid('admin', 'vendor', 'corper'),
-  phoneNumber: Joi.string(),
-  nyscServiceNumber: Joi.string()
+  role: Joi.string().valid('admin', 'vendor', 'corper').default('corper'),
+  phoneNumber: Joi.string().allow(''),
+  nyscServiceNumber: Joi.when('role', {
+    is: 'corper',
+    then: Joi.string().required().messages({ 'any.required': 'NYSC service number is required for corps members.' }),
+    otherwise: Joi.string().allow('', null).optional()
+  })
 });
 
 const loginSchema = Joi.object({

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Wallet, LayoutDashboard, LogOut, ShieldCheck, Store, BarChart2, ChevronDown, UserCircle, KeyRound } from 'lucide-react';
+import { Wallet, LayoutDashboard, LogOut, ShieldCheck, Store, BarChart2, ChevronDown, UserCircle, Settings } from 'lucide-react';
 
 const Navbar = ({ user, onLogout }) => {
   const navigate = useNavigate();
@@ -25,48 +25,55 @@ const Navbar = ({ user, onLogout }) => {
   const initials = `${user.firstName?.[0] || ''}${user.lastName?.[0] || ''}`.toUpperCase();
 
   return (
-    <nav className="bg-[#075f47] text-white shadow-lg">
+    <nav className="bg-white border-b border-gray-200 shadow-sm">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
 
-          {/* Left: logo + nav links */}
+          {/* Logo */}
           <div className="flex items-center space-x-8">
-            <Link to="/dashboard" className="text-2xl font-bold tracking-tight">Mami Pay</Link>
-            <div className="hidden md:flex space-x-4">
-              <Link to="/dashboard" className="flex items-center space-x-1 hover:text-green-200 transition-colors">
-                <LayoutDashboard size={18} />
+            <Link to="/dashboard" className="flex items-center gap-2.5">
+              <div className="w-8 h-8 bg-[#075f47] rounded-lg flex items-center justify-center flex-shrink-0">
+                <span className="text-white text-sm font-bold">M</span>
+              </div>
+              <span className="text-xl font-bold text-[#075f47] tracking-tight">Mami Pay</span>
+            </Link>
+
+            {/* Nav links */}
+            <div className="hidden md:flex space-x-1">
+              <Link to="/dashboard" className="flex items-center space-x-1.5 px-3 py-2 rounded-lg text-gray-600 hover:text-[#075f47] hover:bg-green-50 transition-colors text-sm font-medium">
+                <LayoutDashboard size={17} />
                 <span>Dashboard</span>
               </Link>
-              <Link to="/wallet" className="flex items-center space-x-1 hover:text-green-200 transition-colors">
-                <Wallet size={18} />
+              <Link to="/wallet" className="flex items-center space-x-1.5 px-3 py-2 rounded-lg text-gray-600 hover:text-[#075f47] hover:bg-green-50 transition-colors text-sm font-medium">
+                <Wallet size={17} />
                 <span>Wallet</span>
               </Link>
               {user.role === 'corper' && (
-                <Link to="/analytics" className="flex items-center space-x-1 hover:text-green-200 transition-colors">
-                  <BarChart2 size={18} />
+                <Link to="/analytics" className="flex items-center space-x-1.5 px-3 py-2 rounded-lg text-gray-600 hover:text-[#075f47] hover:bg-green-50 transition-colors text-sm font-medium">
+                  <BarChart2 size={17} />
                   <span>Analytics</span>
                 </Link>
               )}
               {user.role === 'vendor' && (
-                <Link to="/vendor" className="flex items-center space-x-1 hover:text-green-200 transition-colors">
-                  <Store size={18} />
+                <Link to="/vendor" className="flex items-center space-x-1.5 px-3 py-2 rounded-lg text-gray-600 hover:text-[#075f47] hover:bg-green-50 transition-colors text-sm font-medium">
+                  <Store size={17} />
                   <span>Vendor</span>
                 </Link>
               )}
               {user.role === 'admin' && (
-                <Link to="/admin" className="flex items-center space-x-1 hover:text-green-200 transition-colors">
-                  <ShieldCheck size={18} />
+                <Link to="/admin" className="flex items-center space-x-1.5 px-3 py-2 rounded-lg text-gray-600 hover:text-[#075f47] hover:bg-green-50 transition-colors text-sm font-medium">
+                  <ShieldCheck size={17} />
                   <span>Admin</span>
                 </Link>
               )}
             </div>
           </div>
 
-          {/* Right: profile dropdown */}
+          {/* Profile dropdown */}
           <div ref={dropdownRef} className="relative">
             <button
               onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg transition-colors"
+              className="flex items-center gap-2 bg-[#075f47] text-white px-3 py-1.5 rounded-lg hover:bg-[#064e3b] transition-colors"
             >
               <div className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center text-xs font-bold">
                 {initials}
@@ -77,13 +84,20 @@ const Navbar = ({ user, onLogout }) => {
 
             {dropdownOpen && (
               <div className="absolute right-0 top-full mt-2 w-52 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50">
-                {/* User info header */}
-                <div className="px-4 py-3 border-b border-gray-100">
-                  <p className="text-sm font-bold text-gray-900">{user.firstName} {user.lastName}</p>
-                  <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                {/* Header */}
+                <div className="px-4 py-3 border-b border-gray-100 bg-gray-50">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-9 h-9 rounded-full bg-[#075f47] flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+                      {initials}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold text-gray-900 truncate">{user.firstName} {user.lastName}</p>
+                      <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                    </div>
+                  </div>
                 </div>
 
-                {/* Menu items */}
+                {/* Items */}
                 <div className="py-1">
                   <Link
                     to="/profile"
@@ -94,12 +108,12 @@ const Navbar = ({ user, onLogout }) => {
                     Profile
                   </Link>
                   <Link
-                    to="/profile#security"
+                    to="/profile"
                     onClick={() => setDropdownOpen(false)}
                     className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                   >
-                    <KeyRound size={16} className="text-gray-400" />
-                    Change Password
+                    <Settings size={16} className="text-gray-400" />
+                    Settings
                   </Link>
                 </div>
 

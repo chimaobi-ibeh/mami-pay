@@ -49,6 +49,10 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: true
   },
+  shopDescription: {
+    type: DataTypes.TEXT,
+    allowNull: true
+  },
   callUpDate: {
     type: DataTypes.DATEONLY,
     allowNull: true

@@ -14,6 +14,7 @@ import ResetPassword from './pages/ResetPassword';
 import PayVendor from './pages/PayVendor';
 import Analytics from './pages/Analytics';
 import Profile from './pages/Profile';
+import VendorOnboard from './pages/VendorOnboard';
 import ProtectedRoute from './components/ProtectedRoute';
 
 const App = () => {
@@ -66,6 +67,11 @@ const App = () => {
         <Route path="/vendor" element={
           <ProtectedRoute user={user} onLogout={logout} requiredRole="vendor">
             <VendorDashboard user={user} />
+          </ProtectedRoute>
+        } />
+        <Route path="/vendor/onboard" element={
+          <ProtectedRoute user={user} onLogout={logout} requiredRole="vendor">
+            <VendorOnboard user={user} />
           </ProtectedRoute>
         } />
         <Route path="/admin" element={

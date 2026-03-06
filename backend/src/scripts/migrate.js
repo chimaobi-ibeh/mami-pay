@@ -14,6 +14,7 @@ const migrations = [
   `ALTER TABLE "Users" ADD COLUMN IF NOT EXISTS "shopCategory" VARCHAR(255)`,
   `ALTER TABLE "Users" ADD COLUMN IF NOT EXISTS "callUpDate" DATE`,
   `ALTER TABLE "Transactions" ADD COLUMN IF NOT EXISTS "category" VARCHAR(255)`,
+  `ALTER TABLE "Users" ADD COLUMN IF NOT EXISTS "shopDescription" TEXT`,
   `UPDATE "Users" SET role = 'corper' WHERE role = 'employee'`,
   `CREATE TABLE IF NOT EXISTS "SavingsVaults" (
     "id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),

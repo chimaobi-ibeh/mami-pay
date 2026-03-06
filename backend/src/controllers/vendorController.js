@@ -21,7 +21,7 @@ const getVendorQR = async (req, res) => {
 const getVendorProfile = async (req, res) => {
   try {
     const vendor = await User.findByPk(req.user.id, {
-      attributes: ['id', 'firstName', 'lastName', 'email', 'phoneNumber', 'shopName', 'shopCategory']
+      attributes: ['id', 'firstName', 'lastName', 'email', 'phoneNumber', 'shopName', 'shopCategory', 'shopDescription']
     });
     const wallet = await Wallet.findOne({ where: { userId: req.user.id } });
     const { count, rows } = await Transaction.findAndCountAll({
@@ -91,7 +91,7 @@ const payVendor = async (req, res) => {
 const getVendorPublicInfo = async (req, res) => {
   try {
     const vendor = await User.findByPk(req.params.vendorId, {
-      attributes: ['id', 'firstName', 'lastName', 'shopName', 'shopCategory']
+      attributes: ['id', 'firstName', 'lastName', 'shopName', 'shopCategory', 'shopDescription']
     });
     if (!vendor || vendor.role !== 'vendor') {
       return res.status(404).json({ error: 'Vendor not found' });
@@ -104,8 +104,8 @@ const getVendorPublicInfo = async (req, res) => {
 
 const updateVendorProfile = async (req, res) => {
   try {
-    const { shopName, shopCategory } = req.body;
-    await User.update({ shopName, shopCategory }, { where: { id: req.user.id } });
+    const { shopName, shopCategory, shopDescription } = req.body;
+    await User.update({ shopName, shopCategory, shopDescription }, { where: { id: req.user.id } });
     res.json({ message: 'Store profile updated' });
   } catch (error) {
     res.status(400).json({ error: error.message });

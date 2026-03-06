@@ -29,6 +29,7 @@ const Register = ({ onLogin }) => {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) return 'Enter a valid email address.';
     if (!formData.password) return 'Password is required.';
     if (formData.password.length < 6) return 'Password must be at least 6 characters.';
+    if (formData.role === 'corper' && !formData.nyscServiceNumber.trim()) return 'NYSC service number is required for corps members.';
     return null;
   };
 
@@ -147,8 +148,9 @@ const Register = ({ onLogin }) => {
                 <input
                   name="nyscServiceNumber"
                   type="text"
+                  required
                   className="appearance-none rounded-lg relative block w-full px-10 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-[#075f47] focus:border-[#075f47] focus:z-10 sm:text-sm"
-                  placeholder="NYSC Service Number (e.g. NY/2024/1234)"
+                  placeholder="NYSC Service Number (e.g. NY/2024/1234) *"
                   value={formData.nyscServiceNumber}
                   onChange={handleChange}
                 />

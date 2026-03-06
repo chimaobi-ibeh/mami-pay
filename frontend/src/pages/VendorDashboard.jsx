@@ -1,20 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Store, TrendingUp, Users, QrCode, Download, ArrowDownLeft, RefreshCw, Pencil, Check } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Store, TrendingUp, QrCode, Download, ArrowDownLeft, RefreshCw, Pencil } from 'lucide-react';
 import api from '../services/api';
 
 const fmt = (n) => `₦${parseFloat(n || 0).toLocaleString()}`;
 
-const SHOP_CATEGORIES = ['Food & Drinks', 'Groceries', 'Clothing', 'Electronics', 'Pharmacy', 'Salon & Beauty', 'Laundry', 'Printing & Stationery', 'Other'];
-
 const VendorDashboard = ({ user }) => {
+  const navigate = useNavigate();
   const [qr, setQr] = useState(null);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showQR, setShowQR] = useState(false);
-  const [onboarding, setOnboarding] = useState({ shopName: '', shopCategory: '' });
-  const [onboardingLoading, setOnboardingLoading] = useState(false);
-  const [onboardingError, setOnboardingError] = useState('');
-  const [editingShop, setEditingShop] = useState(false);
 
   const token = localStorage.getItem('token');
   const config = { headers: { Authorization: `Bearer ${token}` } };
@@ -24,6 +20,9 @@ const VendorDashboard = ({ user }) => {
       try {
         const res = await api.get('/api/vendor/profile', config);
         setProfile(res.data);
+        if (!res.data.vendor?.shopName) {
+          navigate('/vendor/onboard');
+        }
       } catch {
         // ignore
       } finally {
@@ -32,6 +31,8 @@ const VendorDashboard = ({ user }) => {
     };
     fetchProfile();
   }, []); // eslint-disable-line
+
+  const shopName = profile?.vendor?.shopName;
 
   const loadQR = async () => {
     if (qr) { setShowQR(true); return; }
@@ -52,24 +53,6 @@ const VendorDashboard = ({ user }) => {
     a.click();
   };
 
-  const saveShopProfile = async (e) => {
-    e.preventDefault();
-    if (!onboarding.shopName.trim()) { setOnboardingError('Shop name is required.'); return; }
-    setOnboardingLoading(true);
-    setOnboardingError('');
-    try {
-      await api.put('/api/vendor/profile', onboarding, config);
-      setProfile(prev => ({ ...prev, vendor: { ...prev?.vendor, ...onboarding } }));
-      setEditingShop(false);
-    } catch (err) {
-      setOnboardingError(err.response?.data?.error || 'Failed to save store profile.');
-    } finally {
-      setOnboardingLoading(false);
-    }
-  };
-
-  const shopName = profile?.vendor?.shopName;
-
   return (
     <div className="space-y-8">
       <div className="flex justify-between items-center">
@@ -86,57 +69,8 @@ const VendorDashboard = ({ user }) => {
         </button>
       </div>
 
-      {/* Onboarding / Store Setup Card */}
-      {!loading && (!shopName || editingShop) && (
-        <div className="card border-2 border-[#075f47]/30 bg-green-50/40">
-          <div className="flex items-center gap-2 mb-1">
-            <Store size={20} className="text-[#075f47]" />
-            <h3 className="font-bold text-gray-900">{shopName ? 'Edit Store Profile' : 'Set Up Your Store'}</h3>
-          </div>
-          <p className="text-sm text-gray-500 mb-4">
-            {shopName ? 'Update your store name and category.' : 'Add your store name and category so corps members can find you.'}
-          </p>
-          <form onSubmit={saveShopProfile} className="space-y-4">
-            {onboardingError && <div className="p-3 bg-red-50 text-red-600 text-sm rounded-lg">{onboardingError}</div>}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Store Name</label>
-                <input
-                  type="text" required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#075f47] focus:border-[#075f47] bg-white"
-                  placeholder="e.g. Mama Ngozi's Kitchen"
-                  value={onboarding.shopName}
-                  onChange={(e) => setOnboarding({ ...onboarding, shopName: e.target.value })}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                <select
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#075f47] focus:border-[#075f47] bg-white"
-                  value={onboarding.shopCategory}
-                  onChange={(e) => setOnboarding({ ...onboarding, shopCategory: e.target.value })}
-                >
-                  <option value="">Select a category</option>
-                  {SHOP_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-                </select>
-              </div>
-            </div>
-            <div className="flex gap-3">
-              <button type="submit" disabled={onboardingLoading} className="btn-primary flex items-center gap-2 disabled:opacity-50">
-                <Check size={16} /> {onboardingLoading ? 'Saving...' : 'Save Store Profile'}
-              </button>
-              {editingShop && (
-                <button type="button" onClick={() => setEditingShop(false)} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors text-sm">
-                  Cancel
-                </button>
-              )}
-            </div>
-          </form>
-        </div>
-      )}
-
-      {/* Store name banner (when already set) */}
-      {!loading && shopName && !editingShop && (
+      {/* Store name banner */}
+      {!loading && shopName && (
         <div className="flex items-center justify-between px-4 py-3 bg-green-50 border border-green-200 rounded-xl">
           <div className="flex items-center gap-2">
             <Store size={18} className="text-[#075f47]" />
@@ -146,7 +80,7 @@ const VendorDashboard = ({ user }) => {
             )}
           </div>
           <button
-            onClick={() => { setOnboarding({ shopName: shopName, shopCategory: profile?.vendor?.shopCategory || '' }); setEditingShop(true); }}
+            onClick={() => navigate('/vendor/onboard')}
             className="flex items-center gap-1 text-xs text-[#075f47] hover:underline"
           >
             <Pencil size={13} /> Edit
