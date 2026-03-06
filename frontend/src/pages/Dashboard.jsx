@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Wallet, ArrowUpRight, ArrowDownLeft, CreditCard, Clock, TrendingDown, BadgeCheck } from 'lucide-react';
 import api from '../services/api';
 
 const fmt = (n) => `₦${parseFloat(n || 0).toLocaleString()}`;
 
 const Dashboard = ({ user }) => {
+  const navigate = useNavigate();
   const [balance, setBalance] = useState(0);
   const [transactions, setTransactions] = useState([]);
   const [allowee, setAllowee] = useState(null);
@@ -54,7 +56,7 @@ const Dashboard = ({ user }) => {
           <p className="text-gray-500">Here's what's happening with your account today.</p>
         </div>
         <div className="flex space-x-3">
-          <button className="btn-primary flex items-center space-x-2">
+          <button onClick={() => navigate('/wallet')} className="btn-primary flex items-center space-x-2">
             <ArrowUpRight size={18} />
             <span>Send Money</span>
           </button>
@@ -144,7 +146,7 @@ const Dashboard = ({ user }) => {
         <div className="lg:col-span-2 space-y-6">
           <div className="flex justify-between items-center">
             <h3 className="text-lg font-bold text-gray-900">Recent Transactions</h3>
-            <button className="text-[#075f47] text-sm font-medium hover:underline">View All</button>
+            <button onClick={() => navigate('/wallet')} className="text-[#075f47] text-sm font-medium hover:underline">View All</button>
           </div>
           <div className="card p-0 overflow-hidden">
             {transactions.length > 0 ? (
@@ -181,13 +183,13 @@ const Dashboard = ({ user }) => {
         <div className="space-y-6">
           <h3 className="text-lg font-bold text-gray-900">Quick Actions</h3>
           <div className="grid grid-cols-2 gap-4">
-            <button className="card flex flex-col items-center justify-center p-4 hover:border-[#075f47] transition-all group">
+            <button onClick={() => navigate('/wallet')} className="card flex flex-col items-center justify-center p-4 hover:border-[#075f47] transition-all group">
               <div className="p-3 bg-green-50 text-[#075f47] rounded-xl mb-2 group-hover:bg-[#075f47] group-hover:text-white transition-all">
                 <ArrowUpRight size={24} />
               </div>
               <span className="text-sm font-medium">Transfer</span>
             </button>
-            <button className="card flex flex-col items-center justify-center p-4 hover:border-[#075f47] transition-all group">
+            <button onClick={() => navigate('/wallet')} className="card flex flex-col items-center justify-center p-4 hover:border-[#075f47] transition-all group">
               <div className="p-3 bg-blue-50 text-blue-600 rounded-xl mb-2 group-hover:bg-blue-600 group-hover:text-white transition-all">
                 <CreditCard size={24} />
               </div>

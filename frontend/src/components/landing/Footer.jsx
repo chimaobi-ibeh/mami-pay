@@ -1,7 +1,24 @@
+import { Link } from 'react-router-dom'
+
 const footerLinks = {
-  Product: ['Personal Accounts', 'NYSC Portal', 'Savings Goals', 'Partner Portal'],
-  Company: ['About Us', 'NYSC Media', 'Security', 'Compliance', 'Contact'],
-  Legal: ['Privacy Policy', 'Terms of Service', 'Cookies'],
+  Product: [
+    { label: 'Personal Accounts', to: '/register' },
+    { label: 'NYSC Portal', to: '/register' },
+    { label: 'Savings Goals', to: '/register' },
+    { label: 'Partner Portal', to: '/register' },
+  ],
+  Company: [
+    { label: 'About Us', href: '#company' },
+    { label: 'NYSC Media', href: '#' },
+    { label: 'Security', href: '#security' },
+    { label: 'Compliance', href: '#' },
+    { label: 'Contact', href: '#company' },
+  ],
+  Legal: [
+    { label: 'Privacy Policy', href: '#' },
+    { label: 'Terms of Service', href: '#' },
+    { label: 'Cookies', href: '#' },
+  ],
 }
 
 export default function Footer() {
@@ -52,10 +69,16 @@ export default function Footer() {
               <h4 className="text-white font-semibold text-sm mb-4">{category}</h4>
               <ul className="space-y-2.5">
                 {links.map((link) => (
-                  <li key={link}>
-                    <a href="#" className="text-gray-500 text-sm hover:text-gray-300 transition-colors">
-                      {link}
-                    </a>
+                  <li key={link.label}>
+                    {link.to ? (
+                      <Link to={link.to} className="text-gray-500 text-sm hover:text-gray-300 transition-colors">
+                        {link.label}
+                      </Link>
+                    ) : (
+                      <a href={link.href} className="text-gray-500 text-sm hover:text-gray-300 transition-colors">
+                        {link.label}
+                      </a>
+                    )}
                   </li>
                 ))}
               </ul>

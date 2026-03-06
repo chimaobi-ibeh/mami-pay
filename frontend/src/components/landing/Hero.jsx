@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+
 export default function Hero() {
   return (
     <section className="pt-24 pb-20 bg-white overflow-hidden">
@@ -23,8 +25,8 @@ export default function Hero() {
             </p>
 
             <div className="flex flex-wrap items-center gap-4">
-              <a
-                href="#"
+              <Link
+                to="/register"
                 className="inline-flex items-center gap-2 bg-[#075f47] text-white font-semibold px-6 py-3 rounded-lg
                            hover:bg-[#064e3b] transition-all duration-200
                            hover:shadow-lg hover:shadow-[#075f47]/25 hover:gap-3 active:scale-[0.98]"
@@ -33,9 +35,9 @@ export default function Hero() {
                 <svg className="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
-              </a>
+              </Link>
               <a
-                href="#"
+                href="#partners"
                 className="text-gray-700 font-medium hover:text-[#075f47] transition-colors duration-200
                            relative after:absolute after:bottom-[-1px] after:left-0 after:w-0 after:h-[1.5px]
                            after:bg-[#075f47] after:transition-all after:duration-250 hover:after:w-full"
