@@ -361,7 +361,7 @@ const Wallet = ({ user }) => {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="space-y-4 md:col-span-1">
-          <div className="card bg-[#075f47] text-white border-none">
+          <div className="bg-[#075f47] text-white p-6 rounded-xl shadow-sm">
             <div className="flex justify-between items-start mb-4">
               <div className="p-2 bg-white/10 rounded-lg"><WalletIcon size={24} /></div>
             </div>

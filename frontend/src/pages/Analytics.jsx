@@ -67,7 +67,7 @@ const Analytics = ({ user }) => {
 
       {/* Summary cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="card bg-[#075f47] text-white border-none">
+        <div className="bg-[#075f47] text-white p-6 rounded-xl shadow-sm">
           <div className="p-2 bg-white/10 rounded-lg w-fit mb-4"><TrendingUp size={24} /></div>
           <p className="text-green-100 text-sm mb-1">Total Received</p>
           <h2 className="text-3xl font-bold">{fmt(totalReceived)}</h2>

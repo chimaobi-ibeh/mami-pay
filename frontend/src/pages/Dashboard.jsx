@@ -81,7 +81,7 @@ const Dashboard = ({ user }) => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="card bg-[#075f47] text-white border-none">
+        <div className="bg-[#075f47] text-white p-6 rounded-xl shadow-sm">
           <div className="flex justify-between items-start mb-4">
             <div className="p-2 bg-white/10 rounded-lg">
               <Wallet size={24} />
