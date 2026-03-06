@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getBalance, transfer, getTransactions, topUp } = require('../controllers/walletController');
+const { getBalance, transfer, getTransactions, topUp, getAlleeSummary } = require('../controllers/walletController');
 const { auth } = require('../middleware/auth');
 const Joi = require('joi');
 
@@ -22,5 +22,6 @@ router.get('/balance', auth, getBalance);
 router.post('/transfer', auth, validate(transferSchema), transfer);
 router.get('/transactions', auth, getTransactions);
 router.post('/topup', auth, topUp);
+router.get('/allowee-summary', auth, getAlleeSummary);
 
 module.exports = router;

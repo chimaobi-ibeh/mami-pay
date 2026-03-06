@@ -7,6 +7,14 @@ const migrations = [
   `ALTER TABLE "Users" ADD COLUMN IF NOT EXISTS "emailVerificationToken" VARCHAR(255)`,
   `ALTER TABLE "Users" ADD COLUMN IF NOT EXISTS "passwordResetToken" VARCHAR(255)`,
   `ALTER TABLE "Users" ADD COLUMN IF NOT EXISTS "passwordResetExpires" TIMESTAMP WITH TIME ZONE`,
+  `ALTER TABLE "Users" ADD COLUMN IF NOT EXISTS "nyscServiceNumber" VARCHAR(255) UNIQUE`,
+  `CREATE TABLE IF NOT EXISTS "SavingsVaults" (
+    "id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "userId" UUID NOT NULL REFERENCES "Users"("id") ON DELETE CASCADE,
+    "balance" DECIMAL(15,2) DEFAULT 0.00,
+    "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+  )`,
 ];
 
 const run = async () => {

@@ -36,6 +36,11 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: true
   },
+  nyscServiceNumber: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    unique: true
+  },
   isVerified: {
     type: DataTypes.BOOLEAN,
     defaultValue: false

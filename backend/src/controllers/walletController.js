@@ -136,4 +136,38 @@ const topUp = async (req, res) => {
   }
 };
 
-module.exports = { getBalance, transfer, getTransactions, topUp };
+const getAlleeSummary = async (req, res) => {
+  try {
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const { Op } = sequelize.Sequelize;
+
+    const result = await Transaction.sum('amount', {
+      where: {
+        receiverId: req.user.id,
+        type: { [Op.in]: ['transfer', 'top_up'] },
+        status: 'completed',
+        createdAt: { [Op.gte]: startOfMonth }
+      }
+    });
+
+    const spent = await Transaction.sum('amount', {
+      where: {
+        senderId: req.user.id,
+        status: 'completed',
+        createdAt: { [Op.gte]: startOfMonth }
+      }
+    });
+
+    res.json({
+      expected: 33000,
+      received: parseFloat(result || 0),
+      spent: parseFloat(spent || 0),
+      month: now.toLocaleString('default', { month: 'long', year: 'numeric' })
+    });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+module.exports = { getBalance, transfer, getTransactions, topUp, getAlleeSummary };

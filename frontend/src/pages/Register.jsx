@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, Mail, Lock, Phone, ArrowRight, ArrowLeft, Eye, EyeOff } from 'lucide-react';
+import { User, Mail, Lock, Phone, ArrowRight, ArrowLeft, Eye, EyeOff, BadgeCheck } from 'lucide-react';
 import api from '../services/api';
 
 const Register = ({ onLogin }) => {
@@ -10,6 +10,7 @@ const Register = ({ onLogin }) => {
     email: '',
     password: '',
     phoneNumber: '',
+    nyscServiceNumber: '',
     role: 'employee'
   });
   const [error, setError] = useState('');
@@ -138,6 +139,21 @@ const Register = ({ onLogin }) => {
                 onChange={handleChange}
               />
             </div>
+            {formData.role === 'employee' && (
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <BadgeCheck className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  name="nyscServiceNumber"
+                  type="text"
+                  className="appearance-none rounded-lg relative block w-full px-10 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-[#075f47] focus:border-[#075f47] focus:z-10 sm:text-sm"
+                  placeholder="NYSC Service Number (e.g. NY/2024/1234)"
+                  value={formData.nyscServiceNumber}
+                  onChange={handleChange}
+                />
+              </div>
+            )}
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Lock className="h-5 w-5 text-gray-400" />

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   Wallet as WalletIcon, ArrowUpRight, ArrowDownLeft,
-  Download, Plus, ChevronLeft, ChevronRight, X
+  Download, Plus, ChevronLeft, ChevronRight, X, Lock, Unlock, PiggyBank
 } from 'lucide-react';
 import api from '../services/api';
 
@@ -25,20 +25,29 @@ const Wallet = ({ user }) => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  const [receipt, setReceipt] = useState(null); // selected transaction for modal
+  const [receipt, setReceipt] = useState(null);
+  const [overdraftLimit, setOverdraftLimit] = useState(0);
+  const [vaultBalance, setVaultBalance] = useState(0);
+  const [vaultAmount, setVaultAmount] = useState('');
+  const [showVault, setShowVault] = useState(false);
+  const [vaultMode, setVaultMode] = useState('lock'); // 'lock' | 'unlock'
+  const [vaultLoading, setVaultLoading] = useState(false);
 
   const token = localStorage.getItem('token');
   const config = { headers: { Authorization: `Bearer ${token}` } };
 
   const fetchData = useCallback(async (p = page) => {
     try {
-      const [balanceRes, transRes] = await Promise.all([
+      const [balanceRes, transRes, vaultRes] = await Promise.all([
         api.get('/api/wallet/balance', config),
         api.get(`/api/wallet/transactions?page=${p}&limit=20`, config),
+        api.get('/api/savings/balance', config),
       ]);
       setBalance(balanceRes.data.balance);
+      setOverdraftLimit(balanceRes.data.overdraftLimit || 0);
       setTransactions(transRes.data.transactions);
       setTotalPages(transRes.data.totalPages || 1);
+      setVaultBalance(vaultRes.data.balance);
       setFetchError('');
     } catch {
       setFetchError('Failed to load wallet data. Please refresh the page.');
@@ -129,6 +138,25 @@ const Wallet = ({ user }) => {
     URL.revokeObjectURL(url);
   };
 
+  const handleVault = async (e) => {
+    e.preventDefault();
+    setVaultLoading(true);
+    setError(''); setSuccess('');
+    try {
+      const endpoint = vaultMode === 'lock' ? '/api/savings/lock' : '/api/savings/unlock';
+      const res = await api.post(endpoint, { amount: vaultAmount }, config);
+      setSuccess(res.data.message);
+      setBalance(res.data.walletBalance);
+      setVaultBalance(res.data.vaultBalance);
+      setVaultAmount('');
+      setShowVault(false);
+    } catch (err) {
+      setError(err.response?.data?.error || 'Vault operation failed.');
+    } finally {
+      setVaultLoading(false);
+    }
+  };
+
   if (loading) return <div className="flex items-center justify-center h-64">Loading wallet...</div>;
   if (fetchError) return (
     <div className="flex items-center justify-center h-64">
@@ -141,6 +169,44 @@ const Wallet = ({ user }) => {
 
   return (
     <div className="space-y-8">
+
+      {/* Vault Modal */}
+      {showVault && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
+            <div className="flex items-center gap-2 mb-4">
+              {vaultMode === 'lock' ? <Lock size={20} className="text-[#075f47]" /> : <Unlock size={20} className="text-[#075f47]" />}
+              <h3 className="text-lg font-bold text-gray-900">
+                {vaultMode === 'lock' ? 'Lock Funds into Vault' : 'Unlock Funds from Vault'}
+              </h3>
+            </div>
+            <p className="text-sm text-gray-500 mb-4">
+              {vaultMode === 'lock'
+                ? `Wallet balance: ${fmt(balance)}`
+                : `Vault balance: ${fmt(vaultBalance)}`}
+            </p>
+            <form onSubmit={handleVault} className="space-y-4">
+              {error && <div className="p-3 bg-red-50 text-red-600 text-sm rounded-lg">{error}</div>}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Amount (₦)</label>
+                <input
+                  type="number" required min="1"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#075f47] focus:border-[#075f47]"
+                  placeholder="0.00"
+                  value={vaultAmount}
+                  onChange={(e) => setVaultAmount(e.target.value)}
+                />
+              </div>
+              <div className="flex justify-end gap-3 pt-2">
+                <button type="button" onClick={() => setShowVault(false)} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">Cancel</button>
+                <button type="submit" disabled={vaultLoading} className="btn-primary disabled:opacity-50">
+                  {vaultLoading ? 'Processing...' : vaultMode === 'lock' ? 'Lock Funds' : 'Unlock Funds'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Receipt Modal */}
       {receipt && (
@@ -294,15 +360,48 @@ const Wallet = ({ user }) => {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="card md:col-span-1 bg-[#075f47] text-white border-none">
-          <div className="flex justify-between items-start mb-4">
-            <div className="p-2 bg-white/10 rounded-lg"><WalletIcon size={24} /></div>
+        <div className="space-y-4 md:col-span-1">
+          <div className="card bg-[#075f47] text-white border-none">
+            <div className="flex justify-between items-start mb-4">
+              <div className="p-2 bg-white/10 rounded-lg"><WalletIcon size={24} /></div>
+            </div>
+            <p className="text-green-100 text-sm mb-1">Available Balance</p>
+            <h2 className="text-3xl font-bold">{fmt(balance)}</h2>
+            {parseFloat(overdraftLimit) > 0 && (
+              <div className="mt-3 flex items-center gap-2 text-xs text-green-200">
+                <span className="bg-white/10 px-2 py-1 rounded">Overdraft: {fmt(overdraftLimit)}</span>
+                <span className="text-green-300">Total available: {fmt(parseFloat(balance) + parseFloat(overdraftLimit))}</span>
+              </div>
+            )}
+            <div className="mt-4 pt-4 border-t border-white/10 flex justify-between items-center">
+              <span className="text-xs text-green-200">Currency: NGN</span>
+              <span className="text-xs font-medium bg-white/20 px-2 py-1 rounded">Active</span>
+            </div>
           </div>
-          <p className="text-green-100 text-sm mb-1">Available Balance</p>
-          <h2 className="text-3xl font-bold">{fmt(balance)}</h2>
-          <div className="mt-6 pt-6 border-t border-white/10 flex justify-between items-center">
-            <span className="text-xs text-green-200">Currency: NGN</span>
-            <span className="text-xs font-medium bg-white/20 px-2 py-1 rounded">Active</span>
+
+          {/* Savings Vault Card */}
+          <div className="card border-2 border-dashed border-[#075f47]/30">
+            <div className="flex justify-between items-start mb-3">
+              <div className="p-2 bg-green-50 text-[#075f47] rounded-lg"><PiggyBank size={20} /></div>
+              <span className="text-xs font-bold text-[#075f47] bg-green-50 px-2 py-1 rounded-full">VAULT</span>
+            </div>
+            <p className="text-gray-500 text-xs mb-1">Savings Vault</p>
+            <h3 className="text-2xl font-bold text-gray-900">{fmt(vaultBalance)}</h3>
+            <p className="text-xs text-gray-400 mt-1 mb-4">Locked savings — tap to manage</p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => { setVaultMode('lock'); setShowVault(true); setError(''); setSuccess(''); }}
+                className="flex-1 flex items-center justify-center gap-1 py-2 text-xs font-medium text-white bg-[#075f47] rounded-lg hover:bg-[#064e3b] transition-colors"
+              >
+                <Lock size={12} /> Lock
+              </button>
+              <button
+                onClick={() => { setVaultMode('unlock'); setShowVault(true); setError(''); setSuccess(''); }}
+                className="flex-1 flex items-center justify-center gap-1 py-2 text-xs font-medium text-[#075f47] border border-[#075f47] rounded-lg hover:bg-green-50 transition-colors"
+              >
+                <Unlock size={12} /> Unlock
+              </button>
+            </div>
           </div>
         </div>
 

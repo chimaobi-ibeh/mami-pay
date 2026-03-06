@@ -4,6 +4,9 @@ const cors = require('cors');
 const morgan = require('morgan');
 const authRoutes = require('./routes/authRoutes');
 const walletRoutes = require('./routes/walletRoutes');
+const vendorRoutes = require('./routes/vendorRoutes');
+const savingsRoutes = require('./routes/savingsRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 
 const app = express();
 
@@ -28,6 +31,9 @@ app.use(morgan('dev'));
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/wallet', walletRoutes);
+app.use('/api/vendor', vendorRoutes);
+app.use('/api/savings', savingsRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -41,6 +47,9 @@ if (process.env.SENTRY_DSN) {
 
 // Error handling middleware
 app.use((err, req, res, next) => {
+  if (err.message === 'Not allowed by CORS') {
+    return res.status(403).json({ error: 'CORS: Origin not allowed' });
+  }
   console.error(err.stack);
   res.status(500).json({ error: 'Something went wrong!' });
 });

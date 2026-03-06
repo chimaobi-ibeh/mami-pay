@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Wallet, ArrowUpRight, ArrowDownLeft, CreditCard, Clock } from 'lucide-react';
+import { Wallet, ArrowUpRight, ArrowDownLeft, CreditCard, Clock, TrendingDown, BadgeCheck } from 'lucide-react';
 import api from '../services/api';
+
+const fmt = (n) => `₦${parseFloat(n || 0).toLocaleString()}`;
 
 const Dashboard = ({ user }) => {
   const [balance, setBalance] = useState(0);
   const [transactions, setTransactions] = useState([]);
+  const [allowee, setAllowee] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -14,13 +17,15 @@ const Dashboard = ({ user }) => {
         const token = localStorage.getItem('token');
         const config = { headers: { Authorization: `Bearer ${token}` } };
 
-        const [balanceRes, transRes] = await Promise.all([
+        const [balanceRes, transRes, alloweeRes] = await Promise.all([
           api.get('/api/wallet/balance', config),
-          api.get('/api/wallet/transactions', config)
+          api.get('/api/wallet/transactions', config),
+          api.get('/api/wallet/allowee-summary', config)
         ]);
 
         setBalance(balanceRes.data.balance);
         setTransactions((transRes.data.transactions || []).slice(0, 5));
+        setAllowee(alloweeRes.data);
       } catch (err) {
         setError('Failed to load dashboard data. Please refresh the page.');
       } finally {
@@ -79,8 +84,8 @@ const Dashboard = ({ user }) => {
             </div>
           </div>
           <p className="text-gray-500 text-sm mb-1">Monthly Income</p>
-          <h2 className="text-2xl font-bold text-gray-900">₦0.00</h2>
-          <p className="mt-2 text-xs text-green-600 font-medium">+0% from last month</p>
+          <h2 className="text-2xl font-bold text-gray-900">{allowee ? fmt(allowee.received) : '₦0.00'}</h2>
+          <p className="mt-2 text-xs text-green-600 font-medium">{allowee?.month || 'This month'}</p>
         </div>
 
         <div className="card">
@@ -90,10 +95,50 @@ const Dashboard = ({ user }) => {
             </div>
           </div>
           <p className="text-gray-500 text-sm mb-1">Monthly Expenses</p>
-          <h2 className="text-2xl font-bold text-gray-900">₦0.00</h2>
-          <p className="mt-2 text-xs text-red-600 font-medium">+0% from last month</p>
+          <h2 className="text-2xl font-bold text-gray-900">{allowee ? fmt(allowee.spent) : '₦0.00'}</h2>
+          <p className="mt-2 text-xs text-red-600 font-medium">{allowee?.month || 'This month'}</p>
         </div>
       </div>
+
+      {/* Allowee Tracker */}
+      {allowee && user.role === 'employee' && (
+        <div className="card border-l-4 border-[#075f47]">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <BadgeCheck size={20} className="text-[#075f47]" />
+              <h3 className="font-bold text-gray-900">Allowee Tracker — {allowee.month}</h3>
+            </div>
+            <span className={`text-xs font-bold px-2 py-1 rounded-full ${allowee.received >= allowee.expected ? 'bg-green-100 text-[#075f47]' : 'bg-yellow-100 text-yellow-700'}`}>
+              {allowee.received >= allowee.expected ? 'Received' : 'Pending'}
+            </span>
+          </div>
+          <div className="grid grid-cols-3 gap-4 mb-4">
+            <div>
+              <p className="text-xs text-gray-500 mb-1">Expected Allowee</p>
+              <p className="text-lg font-bold text-gray-900">{fmt(allowee.expected)}</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 mb-1">Received This Month</p>
+              <p className="text-lg font-bold text-[#075f47]">{fmt(allowee.received)}</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 mb-1">Spent This Month</p>
+              <p className="text-lg font-bold text-red-600">{fmt(allowee.spent)}</p>
+            </div>
+          </div>
+          <div className="w-full bg-gray-100 rounded-full h-2">
+            <div
+              className="bg-[#075f47] h-2 rounded-full transition-all"
+              style={{ width: `${Math.min(100, (allowee.received / allowee.expected) * 100)}%` }}
+            />
+          </div>
+          <p className="text-xs text-gray-400 mt-1">
+            {allowee.received >= allowee.expected
+              ? 'Full allowee received'
+              : `${fmt(allowee.expected - allowee.received)} remaining`}
+          </p>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">

@@ -10,11 +10,18 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key_here';
 
 const register = async (req, res) => {
   try {
-    const { firstName, lastName, email, password, role, phoneNumber } = req.body;
+    const { firstName, lastName, email, password, role, phoneNumber, nyscServiceNumber } = req.body;
 
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
       return res.status(400).json({ error: 'Email already in use' });
+    }
+
+    if (nyscServiceNumber) {
+      const existingNysc = await User.findOne({ where: { nyscServiceNumber } });
+      if (existingNysc) {
+        return res.status(400).json({ error: 'This NYSC service number is already registered' });
+      }
     }
 
     const emailVerificationToken = crypto.randomBytes(32).toString('hex');
@@ -26,6 +33,7 @@ const register = async (req, res) => {
       password,
       role: role || 'employee',
       phoneNumber,
+      nyscServiceNumber: nyscServiceNumber || null,
       emailVerificationToken,
     });
 
