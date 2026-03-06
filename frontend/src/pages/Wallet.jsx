@@ -441,7 +441,12 @@ const Wallet = ({ user }) => {
                         </div>
                         <div>
                           <p className="text-sm font-bold text-gray-900">{tx.description || tx.type.replace('_', ' ')}</p>
-                          <p className="text-xs text-gray-500 font-medium">{tx.reference}</p>
+                          <div className="flex items-center gap-2 mt-0.5">
+                            <p className="text-xs text-gray-500 font-medium">{tx.reference}</p>
+                            {tx.category && (
+                              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-gray-100 text-gray-500">{tx.category}</span>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </td>

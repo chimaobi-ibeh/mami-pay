@@ -41,6 +41,18 @@ const User = sequelize.define('User', {
     allowNull: true,
     unique: true
   },
+  shopName: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  shopCategory: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  callUpDate: {
+    type: DataTypes.DATEONLY,
+    allowNull: true
+  },
   isVerified: {
     type: DataTypes.BOOLEAN,
     defaultValue: false

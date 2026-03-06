@@ -21,7 +21,7 @@ const getVendorQR = async (req, res) => {
 const getVendorProfile = async (req, res) => {
   try {
     const vendor = await User.findByPk(req.user.id, {
-      attributes: ['id', 'firstName', 'lastName', 'email', 'phoneNumber']
+      attributes: ['id', 'firstName', 'lastName', 'email', 'phoneNumber', 'shopName', 'shopCategory']
     });
     const wallet = await Wallet.findOne({ where: { userId: req.user.id } });
     const { count, rows } = await Transaction.findAndCountAll({
@@ -76,7 +76,8 @@ const payVendor = async (req, res) => {
       type: 'vendor_payment',
       status: 'completed',
       reference: `VND-${uuidv4().substring(0, 8).toUpperCase()}`,
-      description: description || `Payment to ${vendor.firstName}'s store`
+      description: description || `Payment to ${vendor.shopName || vendor.firstName + "'s store"}`,
+      category: 'Food & Shopping'
     }, { transaction: t });
 
     await t.commit();
@@ -90,7 +91,7 @@ const payVendor = async (req, res) => {
 const getVendorPublicInfo = async (req, res) => {
   try {
     const vendor = await User.findByPk(req.params.vendorId, {
-      attributes: ['id', 'firstName', 'lastName']
+      attributes: ['id', 'firstName', 'lastName', 'shopName', 'shopCategory']
     });
     if (!vendor || vendor.role !== 'vendor') {
       return res.status(404).json({ error: 'Vendor not found' });
@@ -101,4 +102,14 @@ const getVendorPublicInfo = async (req, res) => {
   }
 };
 
-module.exports = { getVendorQR, getVendorProfile, payVendor, getVendorPublicInfo };
+const updateVendorProfile = async (req, res) => {
+  try {
+    const { shopName, shopCategory } = req.body;
+    await User.update({ shopName, shopCategory }, { where: { id: req.user.id } });
+    res.json({ message: 'Store profile updated' });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+module.exports = { getVendorQR, getVendorProfile, payVendor, getVendorPublicInfo, updateVendorProfile };

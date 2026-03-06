@@ -51,7 +51,8 @@ const transfer = async (req, res) => {
       type: 'transfer',
       status: 'completed',
       reference: `TRF-${uuidv4().substring(0, 8).toUpperCase()}`,
-      description
+      description,
+      category: 'Transfer'
     }, { transaction: t });
 
     await logAction(senderId, 'TRANSFER', 'Wallet', senderWallet.id, null, { amount, receiverId: receiver.id }, req);
@@ -127,7 +128,8 @@ const topUp = async (req, res) => {
       type: 'top_up',
       status: 'completed',
       reference: `TOP-${uuidv4().substring(0, 8).toUpperCase()}`,
-      description: 'Wallet top-up'
+      description: 'Wallet top-up',
+      category: 'Top-up'
     });
 
     res.json({ message: 'Top-up successful', balance: wallet.balance });

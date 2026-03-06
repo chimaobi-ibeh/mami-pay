@@ -1,15 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Wallet, ArrowUpRight, ArrowDownLeft, CreditCard, Clock, TrendingDown, BadgeCheck } from 'lucide-react';
+import { Wallet, ArrowUpRight, ArrowDownLeft, CreditCard, Clock, TrendingDown, BadgeCheck, CalendarDays } from 'lucide-react';
 import api from '../services/api';
 
 const fmt = (n) => `₦${parseFloat(n || 0).toLocaleString()}`;
+
+const getDaysRemaining = (callUpDate) => {
+  if (!callUpDate) return null;
+  const pop = new Date(callUpDate);
+  pop.setFullYear(pop.getFullYear() + 1); // 1 year service
+  const diff = pop - new Date();
+  return Math.ceil(diff / (1000 * 60 * 60 * 24));
+};
 
 const Dashboard = ({ user }) => {
   const navigate = useNavigate();
   const [balance, setBalance] = useState(0);
   const [transactions, setTransactions] = useState([]);
   const [allowee, setAllowee] = useState(null);
+  const [callUpDate, setCallUpDate] = useState(null);
+  const [settingDate, setSettingDate] = useState(false);
+  const [dateInput, setDateInput] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -27,9 +38,12 @@ const Dashboard = ({ user }) => {
         setBalance(balanceRes.data.balance);
         setTransactions((transRes.data.transactions || []).slice(0, 5));
 
-        // Non-critical — don't block dashboard if this fails
+        // Non-critical fetches — don't block dashboard if these fail
         api.get('/api/wallet/allowee-summary', config)
           .then(r => setAllowee(r.data))
+          .catch(() => {});
+        api.get('/api/auth/profile', config)
+          .then(r => setCallUpDate(r.data.user?.callUpDate || null))
           .catch(() => {});
       } catch (err) {
         setError('Failed to load dashboard data. Please refresh the page.');
@@ -142,6 +156,87 @@ const Dashboard = ({ user }) => {
               ? 'Full allowee received'
               : `${fmt(allowee.expected - allowee.received)} remaining`}
           </p>
+        </div>
+      )}
+
+      {/* Clearance Countdown — corpers only */}
+      {user.role === 'corper' && (
+        <div className="card border-l-4 border-blue-400">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <CalendarDays size={20} className="text-blue-500" />
+              <h3 className="font-bold text-gray-900">Service Countdown</h3>
+            </div>
+            {callUpDate && !settingDate && (
+              <button
+                onClick={() => { setDateInput(callUpDate); setSettingDate(true); }}
+                className="text-xs text-gray-400 hover:text-blue-500 transition-colors"
+              >
+                Change date
+              </button>
+            )}
+          </div>
+
+          {!callUpDate && !settingDate ? (
+            <div>
+              <p className="text-sm text-gray-500 mb-3">Set your call-up date to track your service countdown.</p>
+              <button
+                onClick={() => setSettingDate(true)}
+                className="text-sm font-medium text-blue-600 hover:underline"
+              >
+                + Set call-up date
+              </button>
+            </div>
+          ) : settingDate ? (
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                const token = localStorage.getItem('token');
+                await api.put('/api/auth/profile', { callUpDate: dateInput }, { headers: { Authorization: `Bearer ${token}` } });
+                setCallUpDate(dateInput);
+                setSettingDate(false);
+              }}
+              className="flex items-end gap-3"
+            >
+              <div className="flex-1">
+                <label className="block text-xs font-medium text-gray-600 mb-1">Call-up Date</label>
+                <input
+                  type="date" required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-blue-400 focus:border-blue-400"
+                  value={dateInput}
+                  onChange={(e) => setDateInput(e.target.value)}
+                />
+              </div>
+              <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors">Save</button>
+              {callUpDate && (
+                <button type="button" onClick={() => setSettingDate(false)} className="px-3 py-2 text-gray-500 hover:bg-gray-100 rounded-lg text-sm">Cancel</button>
+              )}
+            </form>
+          ) : (() => {
+            const daysLeft = getDaysRemaining(callUpDate);
+            const popDate = new Date(callUpDate);
+            popDate.setFullYear(popDate.getFullYear() + 1);
+            const progress = Math.max(0, Math.min(100, ((365 - Math.max(0, daysLeft)) / 365) * 100));
+            return (
+              <div>
+                <div className="flex items-end gap-2 mb-3">
+                  <span className="text-4xl font-extrabold text-gray-900">{Math.max(0, daysLeft)}</span>
+                  <span className="text-gray-500 mb-1">days until POP</span>
+                  {daysLeft <= 0 && <span className="text-xs font-bold text-green-600 bg-green-100 px-2 py-0.5 rounded-full ml-2">Passed Out!</span>}
+                </div>
+                <div className="w-full bg-gray-100 rounded-full h-2 mb-2">
+                  <div
+                    className="bg-blue-400 h-2 rounded-full transition-all duration-500"
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+                <p className="text-xs text-gray-400">
+                  POP Date: {popDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+                  {' · '}Call-up: {new Date(callUpDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+                </p>
+              </div>
+            );
+          })()}
         </div>
       )}
 

@@ -48,6 +48,10 @@ const Transaction = sequelize.define('Transaction', {
   metadata: {
     type: DataTypes.JSONB,
     allowNull: true
+  },
+  category: {
+    type: DataTypes.STRING,
+    allowNull: true
   }
 });
 

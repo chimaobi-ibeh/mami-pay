@@ -11,6 +11,8 @@ import NotFound from './pages/NotFound';
 import VerifyEmail from './pages/VerifyEmail';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import PayVendor from './pages/PayVendor';
+import Analytics from './pages/Analytics';
 import ProtectedRoute from './components/ProtectedRoute';
 
 const App = () => {
@@ -64,6 +66,17 @@ const App = () => {
         <Route path="/admin" element={
           <ProtectedRoute user={user} onLogout={logout} requiredRole="admin">
             <AdminDashboard user={user} />
+          </ProtectedRoute>
+        } />
+
+        <Route path="/pay/vendor/:vendorId" element={
+          <ProtectedRoute user={user} onLogout={logout}>
+            <PayVendor user={user} />
+          </ProtectedRoute>
+        } />
+        <Route path="/analytics" element={
+          <ProtectedRoute user={user} onLogout={logout}>
+            <Analytics user={user} />
           </ProtectedRoute>
         } />
 

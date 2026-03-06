@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Wallet, LayoutDashboard, LogOut, User, ShieldCheck, Store } from 'lucide-react';
+import { Wallet, LayoutDashboard, LogOut, User, ShieldCheck, Store, BarChart2 } from 'lucide-react';
 
 const Navbar = ({ user, onLogout }) => {
   const navigate = useNavigate();
@@ -25,6 +25,12 @@ const Navbar = ({ user, onLogout }) => {
                 <Wallet size={18} />
                 <span>Wallet</span>
               </Link>
+              {user.role === 'corper' && (
+                <Link to="/analytics" className="flex items-center space-x-1 hover:text-green-200 transition-colors">
+                  <BarChart2 size={18} />
+                  <span>Analytics</span>
+                </Link>
+              )}
               {user.role === 'vendor' && (
                 <Link to="/vendor" className="flex items-center space-x-1 hover:text-green-200 transition-colors">
                   <Store size={18} />

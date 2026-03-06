@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getVendorQR, getVendorProfile, payVendor, getVendorPublicInfo } = require('../controllers/vendorController');
+const { getVendorQR, getVendorProfile, payVendor, getVendorPublicInfo, updateVendorProfile } = require('../controllers/vendorController');
 const { auth } = require('../middleware/auth');
 const Joi = require('joi');
 
@@ -19,6 +19,7 @@ const validate = (schema) => (req, res, next) => {
 router.get('/qr', auth, getVendorQR);
 router.get('/profile', auth, getVendorProfile);
 router.post('/pay', auth, validate(paySchema), payVendor);
+router.put('/profile', auth, updateVendorProfile);
 router.get('/info/:vendorId', getVendorPublicInfo); // public — used by QR scan page
 
 module.exports = router;

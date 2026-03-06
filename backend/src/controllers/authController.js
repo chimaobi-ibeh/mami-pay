@@ -132,4 +132,26 @@ const resetPassword = async (req, res) => {
   }
 };
 
-module.exports = { register, login, verifyEmail, forgotPassword, resetPassword };
+const getProfile = async (req, res) => {
+  try {
+    const user = await User.findByPk(req.user.id, {
+      attributes: ['id', 'firstName', 'lastName', 'email', 'role', 'phoneNumber', 'nyscServiceNumber', 'callUpDate', 'shopName', 'shopCategory', 'isVerified']
+    });
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    res.json({ user });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+const updateProfile = async (req, res) => {
+  try {
+    const { callUpDate } = req.body;
+    await User.update({ callUpDate }, { where: { id: req.user.id } });
+    res.json({ message: 'Profile updated', callUpDate });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+module.exports = { register, login, verifyEmail, forgotPassword, resetPassword, getProfile, updateProfile };
