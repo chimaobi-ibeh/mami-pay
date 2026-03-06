@@ -20,7 +20,8 @@
       "Bash(powershell -Command \"Get-Content ''C:\\\\Users\\\\user\\\\Desktop\\\\mami-pay\\\\backend\\\\package'' -Raw\")",
       "Bash(powershell -Command \"\\(Get-Item ''C:\\\\Users\\\\user\\\\Desktop\\\\mami-pay\\\\backend\\\\package.json''\\).Length\")",
       "Bash(npm install express-rate-limit --save)",
-      "Bash(npm install nodemailer --save)"
+      "Bash(npm install nodemailer --save)",
+      "Bash(npm run migrate)"
     ]
   }
 }
