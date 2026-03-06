@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getBalance, transfer, getTransactions } = require('../controllers/walletController');
+const { getBalance, transfer, getTransactions, topUp } = require('../controllers/walletController');
 const { auth } = require('../middleware/auth');
 const Joi = require('joi');
 
@@ -21,5 +21,6 @@ const validate = (schema) => (req, res, next) => {
 router.get('/balance', auth, getBalance);
 router.post('/transfer', auth, validate(transferSchema), transfer);
 router.get('/transactions', auth, getTransactions);
+router.post('/topup', auth, topUp);
 
 module.exports = router;

@@ -20,8 +20,20 @@ const Register = ({ onLogin }) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const validate = () => {
+    if (!formData.firstName.trim()) return 'First name is required.';
+    if (!formData.lastName.trim()) return 'Last name is required.';
+    if (!formData.email.trim()) return 'Email is required.';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) return 'Enter a valid email address.';
+    if (!formData.password) return 'Password is required.';
+    if (formData.password.length < 6) return 'Password must be at least 6 characters.';
+    return null;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const validationError = validate();
+    if (validationError) { setError(validationError); return; }
     setError('');
     setLoading(true);
 

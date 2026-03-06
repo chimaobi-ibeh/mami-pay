@@ -1,7 +1,7 @@
 const { Sequelize } = require('sequelize');
 require('dotenv').config();
 
-const isProduction = process.env.NODE_ENV === 'production';
+const useSSL = process.env.DB_SSL === 'true' || process.env.NODE_ENV === 'production';
 
 const sequelize = new Sequelize(
   process.env.DB_NAME || 'mami_pay',
@@ -18,7 +18,7 @@ const sequelize = new Sequelize(
       acquire: 30000,
       idle: 10000
     },
-    ...(isProduction && {
+    ...(useSSL && {
       dialectOptions: {
         ssl: {
           require: true,

@@ -6,22 +6,23 @@ const Dashboard = ({ user }) => {
   const [balance, setBalance] = useState(0);
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem('token');
         const config = { headers: { Authorization: `Bearer ${token}` } };
-        
+
         const [balanceRes, transRes] = await Promise.all([
           api.get('/api/wallet/balance', config),
           api.get('/api/wallet/transactions', config)
         ]);
-        
+
         setBalance(balanceRes.data.balance);
         setTransactions(transRes.data.slice(0, 5));
       } catch (err) {
-        console.error('Error fetching dashboard data:', err);
+        setError('Failed to load dashboard data. Please refresh the page.');
       } finally {
         setLoading(false);
       }
@@ -31,6 +32,14 @@ const Dashboard = ({ user }) => {
   }, []);
 
   if (loading) return <div className="flex items-center justify-center h-64">Loading dashboard...</div>;
+  if (error) return (
+    <div className="flex items-center justify-center h-64">
+      <div className="text-center">
+        <p className="text-red-600 font-medium">{error}</p>
+        <button onClick={() => window.location.reload()} className="mt-4 btn-primary">Retry</button>
+      </div>
+    </div>
+  );
 
   return (
     <div className="space-y-8">

@@ -6,7 +6,12 @@ import Dashboard from './pages/Dashboard';
 import Wallet from './pages/Wallet';
 import VendorDashboard from './pages/VendorDashboard';
 import AdminDashboard from './pages/AdminDashboard';
-import Navbar from './components/Navbar';
+import LandingPage from './pages/LandingPage';
+import NotFound from './pages/NotFound';
+import VerifyEmail from './pages/VerifyEmail';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
+import ProtectedRoute from './components/ProtectedRoute';
 
 const App = () => {
   const [user, setUser] = useState(null);
@@ -36,29 +41,38 @@ const App = () => {
 
   return (
     <Router>
-      <div className="min-h-screen bg-gray-50">
-        {user && <Navbar user={user} onLogout={logout} />}
-        <div className={user ? "container mx-auto px-4 py-8" : ""}>
-          <Routes>
-            <Route path="/login" element={!user ? <Login onLogin={login} /> : <Navigate to="/dashboard" />} />
-            <Route path="/register" element={!user ? <Register onLogin={login} /> : <Navigate to="/dashboard" />} />
-            
-            <Route path="/dashboard" element={user ? <Dashboard user={user} /> : <Navigate to="/login" />} />
-            <Route path="/wallet" element={user ? <Wallet user={user} /> : <Navigate to="/login" />} />
-            
-            <Route 
-              path="/vendor" 
-              element={user?.role === 'vendor' ? <VendorDashboard user={user} /> : <Navigate to="/dashboard" />} 
-            />
-            <Route 
-              path="/admin" 
-              element={user?.role === 'admin' ? <AdminDashboard user={user} /> : <Navigate to="/dashboard" />} 
-            />
-            
-            <Route path="/" element={<Navigate to={user ? "/dashboard" : "/login"} />} />
-          </Routes>
-        </div>
-      </div>
+      <Routes>
+        <Route path="/" element={user ? <Navigate to="/dashboard" /> : <LandingPage />} />
+        <Route path="/login" element={!user ? <Login onLogin={login} /> : <Navigate to="/dashboard" />} />
+        <Route path="/register" element={!user ? <Register onLogin={login} /> : <Navigate to="/dashboard" />} />
+
+        <Route path="/dashboard" element={
+          <ProtectedRoute user={user} onLogout={logout}>
+            <Dashboard user={user} />
+          </ProtectedRoute>
+        } />
+        <Route path="/wallet" element={
+          <ProtectedRoute user={user} onLogout={logout}>
+            <Wallet user={user} />
+          </ProtectedRoute>
+        } />
+        <Route path="/vendor" element={
+          <ProtectedRoute user={user} onLogout={logout} requiredRole="vendor">
+            <VendorDashboard user={user} />
+          </ProtectedRoute>
+        } />
+        <Route path="/admin" element={
+          <ProtectedRoute user={user} onLogout={logout} requiredRole="admin">
+            <AdminDashboard user={user} />
+          </ProtectedRoute>
+        } />
+
+        <Route path="/verify-email" element={<VerifyEmail />} />
+        <Route path="/forgot-password" element={!user ? <ForgotPassword /> : <Navigate to="/dashboard" />} />
+        <Route path="/reset-password" element={!user ? <ResetPassword /> : <Navigate to="/dashboard" />} />
+
+        <Route path="*" element={<NotFound />} />
+      </Routes>
     </Router>
   );
 };

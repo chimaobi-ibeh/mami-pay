@@ -10,8 +10,17 @@ const Login = ({ onLogin }) => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  const validate = () => {
+    if (!email.trim()) return 'Email is required.';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return 'Enter a valid email address.';
+    if (!password) return 'Password is required.';
+    return null;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const validationError = validate();
+    if (validationError) { setError(validationError); return; }
     setError('');
     setLoading(true);
 
@@ -87,7 +96,12 @@ const Login = ({ onLogin }) => {
             </button>
           </div>
         </form>
-        <div className="text-center">
+        <div className="text-center space-y-2">
+          <p className="text-sm text-gray-600">
+            <Link to="/forgot-password" className="font-medium text-[#075f47] hover:text-[#064e3b]">
+              Forgot your password?
+            </Link>
+          </p>
           <p className="text-sm text-gray-600">
             Don't have an account?{' '}
             <Link to="/register" className="font-medium text-[#075f47] hover:text-[#064e3b]">
