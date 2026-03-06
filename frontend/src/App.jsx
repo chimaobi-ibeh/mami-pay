@@ -13,6 +13,7 @@ import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import PayVendor from './pages/PayVendor';
 import Analytics from './pages/Analytics';
+import Profile from './pages/Profile';
 import ProtectedRoute from './components/ProtectedRoute';
 
 const App = () => {
@@ -37,6 +38,10 @@ const App = () => {
     localStorage.removeItem('user');
     localStorage.removeItem('token');
     setUser(null);
+  };
+
+  const handleProfileUpdate = (updatedUser) => {
+    setUser(updatedUser);
   };
 
   if (loading) return <div className="flex items-center justify-center h-screen">Loading...</div>;
@@ -77,6 +82,11 @@ const App = () => {
         <Route path="/analytics" element={
           <ProtectedRoute user={user} onLogout={logout}>
             <Analytics user={user} />
+          </ProtectedRoute>
+        } />
+        <Route path="/profile" element={
+          <ProtectedRoute user={user} onLogout={logout}>
+            <Profile user={user} onProfileUpdate={handleProfileUpdate} />
           </ProtectedRoute>
         } />
 

@@ -146,12 +146,26 @@ const getProfile = async (req, res) => {
 
 const updateProfile = async (req, res) => {
   try {
-    const { callUpDate } = req.body;
-    await User.update({ callUpDate }, { where: { id: req.user.id } });
-    res.json({ message: 'Profile updated', callUpDate });
+    const { firstName, lastName, phoneNumber, callUpDate } = req.body;
+    await User.update({ firstName, lastName, phoneNumber, callUpDate }, { where: { id: req.user.id } });
+    res.json({ message: 'Profile updated' });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
 
-module.exports = { register, login, verifyEmail, forgotPassword, resetPassword, getProfile, updateProfile };
+const changePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const user = await User.findByPk(req.user.id);
+    if (!user || !(await user.comparePassword(currentPassword))) {
+      return res.status(401).json({ error: 'Current password is incorrect.' });
+    }
+    await user.update({ password: newPassword });
+    res.json({ message: 'Password changed successfully.' });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+module.exports = { register, login, verifyEmail, forgotPassword, resetPassword, getProfile, updateProfile, changePassword };
