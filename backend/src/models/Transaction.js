@@ -29,7 +29,7 @@ const Transaction = sequelize.define('Transaction', {
     allowNull: false
   },
   type: {
-    type: DataTypes.ENUM('transfer', 'deposit', 'withdrawal', 'payroll', 'overdraft', 'vendor_payment'),
+    type: DataTypes.ENUM('transfer', 'deposit', 'withdrawal', 'payroll', 'overdraft', 'vendor_payment', 'top_up'),
     allowNull: false
   },
   status: {

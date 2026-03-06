@@ -9,6 +9,7 @@ const migrations = [
   `ALTER TABLE "Users" ADD COLUMN IF NOT EXISTS "passwordResetExpires" TIMESTAMP WITH TIME ZONE`,
   `ALTER TABLE "Users" ADD COLUMN IF NOT EXISTS "nyscServiceNumber" VARCHAR(255) UNIQUE`,
   `ALTER TYPE "enum_Users_role" ADD VALUE IF NOT EXISTS 'corper'`,
+  `ALTER TYPE "enum_Transactions_type" ADD VALUE IF NOT EXISTS 'top_up'`,
   `UPDATE "Users" SET role = 'corper' WHERE role = 'employee'`,
   `CREATE TABLE IF NOT EXISTS "SavingsVaults" (
     "id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),

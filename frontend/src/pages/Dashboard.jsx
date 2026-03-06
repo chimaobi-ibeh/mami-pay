@@ -19,15 +19,18 @@ const Dashboard = ({ user }) => {
         const token = localStorage.getItem('token');
         const config = { headers: { Authorization: `Bearer ${token}` } };
 
-        const [balanceRes, transRes, alloweeRes] = await Promise.all([
+        const [balanceRes, transRes] = await Promise.all([
           api.get('/api/wallet/balance', config),
           api.get('/api/wallet/transactions', config),
-          api.get('/api/wallet/allowee-summary', config)
         ]);
 
         setBalance(balanceRes.data.balance);
         setTransactions((transRes.data.transactions || []).slice(0, 5));
-        setAllowee(alloweeRes.data);
+
+        // Non-critical — don't block dashboard if this fails
+        api.get('/api/wallet/allowee-summary', config)
+          .then(r => setAllowee(r.data))
+          .catch(() => {});
       } catch (err) {
         setError('Failed to load dashboard data. Please refresh the page.');
       } finally {
