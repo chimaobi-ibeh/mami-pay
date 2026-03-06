@@ -160,7 +160,7 @@ const getAlleeSummary = async (req, res) => {
     });
 
     res.json({
-      expected: 33000,
+      expected: 77000,
       received: parseFloat(result || 0),
       spent: parseFloat(spent || 0),
       month: now.toLocaleString('default', { month: 'long', year: 'numeric' })

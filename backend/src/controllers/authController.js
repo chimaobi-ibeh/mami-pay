@@ -31,7 +31,7 @@ const register = async (req, res) => {
       lastName,
       email,
       password,
-      role: role || 'employee',
+      role: role || 'corper',
       phoneNumber,
       nyscServiceNumber: nyscServiceNumber || null,
       emailVerificationToken,

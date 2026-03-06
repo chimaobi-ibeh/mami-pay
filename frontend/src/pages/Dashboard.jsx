@@ -101,7 +101,7 @@ const Dashboard = ({ user }) => {
       </div>
 
       {/* Allowee Tracker */}
-      {allowee && user.role === 'employee' && (
+      {allowee && user.role === 'corper' && (
         <div className="card border-l-4 border-[#075f47]">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">

@@ -73,7 +73,7 @@ export default function Hero() {
                     {/* Balance Card */}
                     <div className="bg-[#075f47] rounded-xl p-4 mb-4">
                       <p className="text-green-300 text-xs mb-1">MAIN BALANCE</p>
-                      <p className="text-white text-2xl font-bold">₦33,000.00</p>
+                      <p className="text-white text-2xl font-bold">₦77,000.00</p>
 
                       {/* Action buttons */}
                       <div className="flex justify-between mt-4">
@@ -147,7 +147,7 @@ export default function Hero() {
                       <div className="w-full h-1.5 bg-green-100 rounded-full overflow-hidden">
                         <div className="h-full w-[68%] bg-[#2e7d52] rounded-full"></div>
                       </div>
-                      <p className="text-gray-400 text-[8px] mt-1">₦22,440 of ₦33,000 saved</p>
+                      <p className="text-gray-400 text-[8px] mt-1">₦52,360 of ₦77,000 saved</p>
                     </div>
                   </div>
                 </div>

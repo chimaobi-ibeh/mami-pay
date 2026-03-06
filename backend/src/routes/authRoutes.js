@@ -17,7 +17,7 @@ const registerSchema = Joi.object({
   lastName: Joi.string().required(),
   email: Joi.string().email().required(),
   password: Joi.string().min(6).required(),
-  role: Joi.string().valid('admin', 'vendor', 'employee'),
+  role: Joi.string().valid('admin', 'vendor', 'corper'),
   phoneNumber: Joi.string(),
   nyscServiceNumber: Joi.string()
 });
