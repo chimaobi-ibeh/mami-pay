@@ -26,3 +26,18 @@ body {
     @apply bg-white p-6 rounded-xl shadow-sm border border-gray-100;
   }
 }
+
+@keyframes pageFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-enter {
+  animation: pageFadeIn 0.22s ease-out both;
+}
