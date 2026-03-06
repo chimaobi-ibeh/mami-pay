@@ -1,0 +1,30 @@
+require('dotenv').config();
+const sequelize = require('../config/database');
+
+const migrations = [
+  `ALTER TABLE "Users" ADD COLUMN IF NOT EXISTS "phoneNumber" VARCHAR(255)`,
+  `ALTER TABLE "Users" ADD COLUMN IF NOT EXISTS "isVerified" BOOLEAN DEFAULT false`,
+  `ALTER TABLE "Users" ADD COLUMN IF NOT EXISTS "emailVerificationToken" VARCHAR(255)`,
+  `ALTER TABLE "Users" ADD COLUMN IF NOT EXISTS "passwordResetToken" VARCHAR(255)`,
+  `ALTER TABLE "Users" ADD COLUMN IF NOT EXISTS "passwordResetExpires" TIMESTAMP WITH TIME ZONE`,
+];
+
+const run = async () => {
+  try {
+    await sequelize.authenticate();
+    console.log('Connected to database.');
+
+    for (const sql of migrations) {
+      await sequelize.query(sql);
+      console.log(`OK: ${sql.slice(0, 60)}...`);
+    }
+
+    console.log('Migration complete.');
+  } catch (err) {
+    console.error('Migration failed:', err.message);
+  } finally {
+    await sequelize.close();
+  }
+};
+
+run();

@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
+    "dev": "cross-env NODE_OPTIONS=--max-old-space-size=4096 vite",
+    "build": "cross-env NODE_OPTIONS=--max-old-space-size=4096 vite build",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -14,9 +14,11 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.14.1",
+    "@sentry/react": "^8.0.0",
     "recharts": "^2.7.2"
   },
   "devDependencies": {
+    "cross-env": "^7.0.3",
     "@types/react": "^18.2.14",
     "@types/react-dom": "^18.2.6",
     "@vitejs/plugin-react": "^4.0.1",

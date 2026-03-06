@@ -1,3 +1,4 @@
+const Sentry = require('@sentry/node');
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
@@ -29,9 +30,14 @@ app.use('/api/auth', authRoutes);
 app.use('/api/wallet', walletRoutes);
 
 // Health check
-app.get('/health', (req, res) => {
+app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
+
+// Sentry error handler (must be before other error handlers)
+if (process.env.SENTRY_DSN) {
+  Sentry.setupExpressErrorHandler(app);
+}
 
 // Error handling middleware
 app.use((err, req, res, next) => {

@@ -20,7 +20,7 @@ const Dashboard = ({ user }) => {
         ]);
 
         setBalance(balanceRes.data.balance);
-        setTransactions(transRes.data.slice(0, 5));
+        setTransactions((transRes.data.transactions || []).slice(0, 5));
       } catch (err) {
         setError('Failed to load dashboard data. Please refresh the page.');
       } finally {

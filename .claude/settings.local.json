@@ -11,7 +11,16 @@
       "Bash(powershell -Command \"Get-ChildItem ''C:\\\\Users\\\\user\\\\Desktop\\\\mami-pay\\\\backend\\\\src'' -Recurse | Where-Object {-not $_.PSIsContainer} | Select-Object Name\")",
       "Bash(gh auth status)",
       "Bash(node --version)",
-      "Bash(npm --version)"
+      "Bash(npm --version)",
+      "Bash(powershell -Command \"Get-Service -Name ''postgresql*'' 2>$null | Select-Object Name, Status\")",
+      "Bash(powershell -Command \"Get-Service | Where-Object { $_.Name -like ''*postgres*'' -or $_.Name -like ''*pg*'' } | Select-Object Name, Status\")",
+      "Bash(pg_isready)",
+      "Bash(docker --version)",
+      "Bash(powershell -Command \"Get-Content ''C:\\\\Users\\\\user\\\\Desktop\\\\mami-pay\\\\frontend\\\\package.json''\")",
+      "Bash(powershell -Command \"Get-Content ''C:\\\\Users\\\\user\\\\Desktop\\\\mami-pay\\\\backend\\\\package'' -Raw\")",
+      "Bash(powershell -Command \"\\(Get-Item ''C:\\\\Users\\\\user\\\\Desktop\\\\mami-pay\\\\backend\\\\package.json''\\).Length\")",
+      "Bash(npm install express-rate-limit --save)",
+      "Bash(npm install nodemailer --save)"
     ]
   }
 }

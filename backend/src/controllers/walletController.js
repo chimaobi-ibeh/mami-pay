@@ -8,9 +8,9 @@ const { v4: uuidv4 } = require('uuid');
 
 const getBalance = async (req, res) => {
   try {
-    const wallet = await Wallet.findOne({ where: { userId: req.user.id } });
+    let wallet = await Wallet.findOne({ where: { userId: req.user.id } });
     if (!wallet) {
-      return res.status(404).json({ error: 'Wallet not found' });
+      wallet = await Wallet.create({ userId: req.user.id });
     }
     res.json({ balance: wallet.balance, currency: wallet.currency, overdraftLimit: wallet.overdraftLimit });
   } catch (error) {
