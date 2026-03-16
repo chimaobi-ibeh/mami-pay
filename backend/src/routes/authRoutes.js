@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { register, login, verifyEmail, forgotPassword, resetPassword, getProfile, updateProfile, changePassword, resendVerification } = require('../controllers/authController');
+const { register, login, verifyEmail, forgotPassword, resetPassword, getProfile, updateProfile, changePassword, resendVerification, deleteAccount } = require('../controllers/authController');
 const { auth } = require('../middleware/auth');
 const Joi = require('joi');
 const rateLimit = require('express-rate-limit');
@@ -65,5 +65,6 @@ router.post('/resend-verification', auth, authLimiter, resendVerification);
 router.get('/profile', auth, getProfile);
 router.put('/profile', auth, updateProfile);
 router.put('/change-password', auth, validate(changePasswordSchema), changePassword);
+router.delete('/account', auth, deleteAccount);
 
 module.exports = router;

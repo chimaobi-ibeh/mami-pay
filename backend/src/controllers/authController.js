@@ -1,5 +1,9 @@
 const User = require('../models/User');
 const Wallet = require('../models/Wallet');
+const Transaction = require('../models/Transaction');
+const AuditLog = require('../models/AuditLog');
+const SavingsVault = require('../models/SavingsVault');
+const sequelize = require('../config/database');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const { logAction } = require('../services/auditLogger');
@@ -185,4 +189,27 @@ const changePassword = async (req, res, next) => {
   }
 };
 
-module.exports = { register, login, verifyEmail, resendVerification, forgotPassword, resetPassword, getProfile, updateProfile, changePassword };
+const deleteAccount = async (req, res, next) => {
+  const t = await sequelize.transaction();
+  try {
+    const userId = req.user.id;
+    const { Op } = sequelize.Sequelize;
+
+    await AuditLog.destroy({ where: { userId }, transaction: t });
+    await Transaction.destroy({
+      where: { [Op.or]: [{ senderId: userId }, { receiverId: userId }] },
+      transaction: t
+    });
+    await SavingsVault.destroy({ where: { userId }, transaction: t });
+    await Wallet.destroy({ where: { userId }, transaction: t });
+    await User.destroy({ where: { id: userId }, transaction: t });
+
+    await t.commit();
+    res.json({ message: 'Account deleted successfully.' });
+  } catch (error) {
+    await t.rollback();
+    next(error);
+  }
+};
+
+module.exports = { register, login, verifyEmail, resendVerification, forgotPassword, resetPassword, getProfile, updateProfile, changePassword, deleteAccount };
