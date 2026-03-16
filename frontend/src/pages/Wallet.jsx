@@ -24,6 +24,22 @@ const Wallet = ({ user }) => {
 
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [verifyMessage, setVerifyMessage] = useState('');
+  const [filterType, setFilterType] = useState('');
+  const [filterStartDate, setFilterStartDate] = useState('');
+  const [filterEndDate, setFilterEndDate] = useState('');
+  const [filterSearch, setFilterSearch] = useState('');
+
+  const resendVerification = async () => {
+    setVerifyMessage('');
+    try {
+      const token = localStorage.getItem('token');
+      await api.post('/api/auth/resend-verification', {}, { headers: { Authorization: `Bearer ${token}` } });
+      setVerifyMessage('Verification email sent. Please check your inbox.');
+    } catch (err) {
+      setVerifyMessage(err.response?.data?.error || 'Unable to resend verification email.');
+    }
+  };
 
   const [receipt, setReceipt] = useState(null);
   const [overdraftLimit, setOverdraftLimit] = useState(0);
@@ -38,9 +54,15 @@ const Wallet = ({ user }) => {
 
   const fetchData = useCallback(async (p = page) => {
     try {
+      const params = new URLSearchParams({ page: p, limit: 20 });
+      if (filterType) params.append('type', filterType);
+      if (filterStartDate) params.append('startDate', filterStartDate);
+      if (filterEndDate) params.append('endDate', filterEndDate);
+      if (filterSearch) params.append('search', filterSearch);
+
       const [balanceRes, transRes, vaultRes] = await Promise.all([
         api.get('/api/wallet/balance', config),
-        api.get(`/api/wallet/transactions?page=${p}&limit=20`, config),
+        api.get(`/api/wallet/transactions?${params.toString()}`, config),
         api.get('/api/savings/balance', config),
       ]);
       setBalance(balanceRes.data.balance);
@@ -54,7 +76,7 @@ const Wallet = ({ user }) => {
     } finally {
       setLoading(false);
     }
-  }, [page]); // eslint-disable-line
+  }, [page, filterType, filterStartDate, filterEndDate, filterSearch]); // eslint-disable-line
 
   useEffect(() => {
     fetchData(page);
@@ -281,6 +303,36 @@ const Wallet = ({ user }) => {
             <ArrowUpRight size={18} />
             <span>New Transfer</span>
           </button>
+        </div>
+      </div>
+      {!user.isVerified && (
+        <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-3 text-sm text-yellow-800 mb-4">
+          Your email is not verified. Please verify to unlock transfers and payments.
+          <button onClick={resendVerification} className="ml-2 font-semibold text-yellow-900 underline">Resend verification email</button>
+          {verifyMessage && <div className="text-xs text-yellow-700 mt-1">{verifyMessage}</div>}
+        </div>
+      )}
+
+      <div className="card mb-4">
+        <div className="flex flex-col md:flex-row gap-2 md:items-end md:justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-gray-500">Filter:</span>
+            <select value={filterType} onChange={(e) => setFilterType(e.target.value)} className="border border-gray-200 rounded px-2 py-1 text-sm">
+              <option value="">All types</option>
+              <option value="transfer">Transfer</option>
+              <option value="top_up">Top Up</option>
+              <option value="vendor_payment">Vendor Payment</option>
+            </select>
+          </div>
+          <div className="flex items-center gap-2">
+            <label className="text-xs text-gray-500">From</label>
+            <input type="date" className="border border-gray-200 rounded px-2 py-1 text-sm" value={filterStartDate} onChange={(e) => setFilterStartDate(e.target.value)} />
+            <label className="text-xs text-gray-500">To</label>
+            <input type="date" className="border border-gray-200 rounded px-2 py-1 text-sm" value={filterEndDate} onChange={(e) => setFilterEndDate(e.target.value)} />
+            <input type="text" className="border border-gray-200 rounded px-2 py-1 text-sm" placeholder="Search description..." value={filterSearch} onChange={(e) => setFilterSearch(e.target.value)} />
+            <button onClick={() => { setPage(1); fetchData(1); }} className="btn-primary px-3 py-1 text-xs">Apply</button>
+            <button onClick={() => { setFilterType(''); setFilterStartDate(''); setFilterEndDate(''); setFilterSearch(''); setPage(1); fetchData(1); }} className="px-3 py-1 border border-gray-200 rounded text-xs text-gray-600">Reset</button>
+          </div>
         </div>
       </div>
 

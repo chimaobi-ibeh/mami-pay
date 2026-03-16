@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { register, login, verifyEmail, forgotPassword, resetPassword, getProfile, updateProfile, changePassword } = require('../controllers/authController');
+const { register, login, verifyEmail, forgotPassword, resetPassword, getProfile, updateProfile, changePassword, resendVerification } = require('../controllers/authController');
 const { auth } = require('../middleware/auth');
 const Joi = require('joi');
 const rateLimit = require('express-rate-limit');
@@ -13,11 +13,20 @@ const authLimiter = rateLimit({
   legacyHeaders: false
 });
 
+const passwordSchema = Joi.string()
+  .min(8)
+  .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/)
+  .required()
+  .messages({
+    'string.pattern.base': 'Password must be at least 8 characters with uppercase, lowercase, and a number',
+    'string.min': 'Password must be at least 8 characters with uppercase, lowercase, and a number'
+  });
+
 const registerSchema = Joi.object({
   firstName: Joi.string().required(),
   lastName: Joi.string().required(),
   email: Joi.string().email().required(),
-  password: Joi.string().min(6).required(),
+  password: passwordSchema,
   role: Joi.string().valid('admin', 'vendor', 'corper').default('corper'),
   phoneNumber: Joi.string().allow(''),
   nyscServiceNumber: Joi.when('role', {
@@ -41,15 +50,20 @@ const validate = (schema) => (req, res, next) => {
 };
 
 const forgotSchema = Joi.object({ email: Joi.string().email().required() });
-const resetSchema = Joi.object({ password: Joi.string().min(6).required() });
+const resetSchema = Joi.object({ password: passwordSchema });
+const changePasswordSchema = Joi.object({
+  currentPassword: Joi.string().required(),
+  newPassword: passwordSchema
+});
 
 router.post('/register', authLimiter, validate(registerSchema), register);
 router.post('/login', authLimiter, validate(loginSchema), login);
 router.get('/verify-email/:token', verifyEmail);
 router.post('/forgot-password', authLimiter, validate(forgotSchema), forgotPassword);
 router.post('/reset-password/:token', validate(resetSchema), resetPassword);
+router.post('/resend-verification', auth, authLimiter, resendVerification);
 router.get('/profile', auth, getProfile);
 router.put('/profile', auth, updateProfile);
-router.put('/change-password', auth, changePassword);
+router.put('/change-password', auth, validate(changePasswordSchema), changePassword);
 
 module.exports = router;

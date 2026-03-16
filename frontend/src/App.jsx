@@ -12,6 +12,7 @@ import VerifyEmail from './pages/VerifyEmail';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import PayVendor from './pages/PayVendor';
+import VendorDirectory from './pages/VendorDirectory';
 import Analytics from './pages/Analytics';
 import Profile from './pages/Profile';
 import VendorOnboard from './pages/VendorOnboard';
@@ -80,6 +81,11 @@ const App = () => {
           </ProtectedRoute>
         } />
 
+        <Route path="/vendors" element={
+          <ProtectedRoute user={user} onLogout={logout}>
+            <VendorDirectory user={user} />
+          </ProtectedRoute>
+        } />
         <Route path="/pay/vendor/:vendorId" element={
           <ProtectedRoute user={user} onLogout={logout}>
             <PayVendor user={user} />

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { getBalance, transfer, getTransactions, topUp, getAlleeSummary } = require('../controllers/walletController');
-const { auth } = require('../middleware/auth');
+const { getBalance, transfer, getTransactions, topUp, getAlleeSummary, getAnalytics } = require('../controllers/walletController');
+const { auth, requireVerified, requireActiveWallet } = require('../middleware/auth');
 const Joi = require('joi');
 
 const transferSchema = Joi.object({
@@ -9,6 +9,8 @@ const transferSchema = Joi.object({
   amount: Joi.number().positive().required(),
   description: Joi.string().max(255)
 });
+
+const topupSchema = Joi.object({ amount: Joi.number().positive().required() });
 
 const validate = (schema) => (req, res, next) => {
   const { error } = schema.validate(req.body);
@@ -19,9 +21,10 @@ const validate = (schema) => (req, res, next) => {
 };
 
 router.get('/balance', auth, getBalance);
-router.post('/transfer', auth, validate(transferSchema), transfer);
+router.post('/transfer', auth, requireVerified, requireActiveWallet, validate(transferSchema), transfer);
 router.get('/transactions', auth, getTransactions);
-router.post('/topup', auth, topUp);
+router.post('/topup', auth, requireVerified, requireActiveWallet, validate(topupSchema), topUp);
 router.get('/allowee-summary', auth, getAlleeSummary);
+router.get('/analytics', auth, getAnalytics);
 
 module.exports = router;

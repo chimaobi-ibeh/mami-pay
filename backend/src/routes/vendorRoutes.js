@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { getVendorQR, getVendorProfile, payVendor, getVendorPublicInfo, updateVendorProfile } = require('../controllers/vendorController');
-const { auth } = require('../middleware/auth');
+const { getVendorQR, getVendorProfile, payVendor, getVendorPublicInfo, listVendors, updateVendorProfile } = require('../controllers/vendorController');
+const { auth, requireVerified, requireActiveWallet } = require('../middleware/auth');
 const Joi = require('joi');
 
 const paySchema = Joi.object({
@@ -18,7 +18,8 @@ const validate = (schema) => (req, res, next) => {
 
 router.get('/qr', auth, getVendorQR);
 router.get('/profile', auth, getVendorProfile);
-router.post('/pay', auth, validate(paySchema), payVendor);
+router.post('/pay', auth, requireVerified, requireActiveWallet, validate(paySchema), payVendor);
+router.get('/directory', listVendors);
 router.put('/profile', auth, updateVendorProfile);
 router.get('/info/:vendorId', getVendorPublicInfo); // public — used by QR scan page
 

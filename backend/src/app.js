@@ -46,12 +46,15 @@ if (process.env.SENTRY_DSN) {
 }
 
 // Error handling middleware
+const { errorHandler } = require('./middleware/errorHandler');
+
 app.use((err, req, res, next) => {
   if (err.message === 'Not allowed by CORS') {
     return res.status(403).json({ error: 'CORS: Origin not allowed' });
   }
-  console.error(err.stack);
-  res.status(500).json({ error: 'Something went wrong!' });
+  next(err);
 });
+
+app.use(errorHandler);
 
 module.exports = app;

@@ -13,9 +13,19 @@ const ResetPassword = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  const passwordStrength = (value) => ({
+    minLength: value.length >= 8,
+    hasUpper: /[A-Z]/.test(value),
+    hasLower: /[a-z]/.test(value),
+    hasNumber: /\d/.test(value),
+  });
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (password.length < 6) { setError('Password must be at least 6 characters.'); return; }
+    const strength = passwordStrength(password);
+    if (!strength.minLength || !strength.hasUpper || !strength.hasLower || !strength.hasNumber) {
+      setError('Password must be at least 8 characters with uppercase, lowercase, and a number.'); return;
+    }
     if (password !== confirm) { setError('Passwords do not match.'); return; }
     setError('');
     setLoading(true);
@@ -63,6 +73,13 @@ const ResetPassword = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
+          </div>
+          <div className="grid grid-cols-2 gap-2 text-xs text-gray-500 mb-2">
+            {Object.entries(passwordStrength(password)).map(([key, valid]) => (
+              <div key={key} className={`px-2 py-1 rounded ${valid ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                {key === 'minLength' ? '8+ characters' : key === 'hasUpper' ? 'Uppercase' : key === 'hasLower' ? 'Lowercase' : 'Number'}
+              </div>
+            ))}
           </div>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">

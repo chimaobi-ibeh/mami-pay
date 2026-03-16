@@ -23,6 +23,19 @@ const Dashboard = ({ user }) => {
   const [dateInput, setDateInput] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [verifyMessage, setVerifyMessage] = useState('');
+
+  const resendVerification = async () => {
+    setVerifyMessage('');
+    try {
+      const token = localStorage.getItem('token');
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      const res = await api.post('/api/auth/resend-verification', {}, config);
+      setVerifyMessage(res.data.message || 'Verification email sent.');
+    } catch (err) {
+      setVerifyMessage(err.response?.data?.error || 'Unable to resend verification email.');
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -79,6 +92,13 @@ const Dashboard = ({ user }) => {
           </button>
         </div>
       </div>
+      {!user.isVerified && (
+        <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-3 text-sm text-yellow-800">
+          Your email is not verified. Please verify to unlock transfers and payments.
+          <button onClick={resendVerification} className="ml-3 font-semibold text-yellow-900 underline">Resend verification email</button>
+          {verifyMessage && <div className="mt-2 text-xs text-yellow-700">{verifyMessage}</div>}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-[#075f47] text-white p-6 rounded-xl shadow-sm">

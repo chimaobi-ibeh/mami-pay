@@ -22,13 +22,25 @@ const Register = ({ onLogin }) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const passwordStrength = (password) => {
+    return {
+      minLength: password.length >= 8,
+      hasUpper: /[A-Z]/.test(password),
+      hasLower: /[a-z]/.test(password),
+      hasNumber: /\d/.test(password),
+    };
+  };
+
   const validate = () => {
     if (!formData.firstName.trim()) return 'First name is required.';
     if (!formData.lastName.trim()) return 'Last name is required.';
     if (!formData.email.trim()) return 'Email is required.';
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) return 'Enter a valid email address.';
     if (!formData.password) return 'Password is required.';
-    if (formData.password.length < 6) return 'Password must be at least 6 characters.';
+    const strength = passwordStrength(formData.password);
+    if (!strength.minLength || !strength.hasUpper || !strength.hasLower || !strength.hasNumber) {
+      return 'Password must be at least 8 characters with uppercase, lowercase, and a number.';
+    }
     if (formData.role === 'corper' && !formData.nyscServiceNumber.trim()) return 'NYSC service number is required for corps members.';
     return null;
   };
@@ -176,6 +188,17 @@ const Register = ({ onLogin }) => {
               >
                 {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
               </button>
+            </div>
+            <div className="grid grid-cols-2 gap-2 text-xs text-gray-500 mb-2">
+              {['minLength', 'hasUpper', 'hasLower', 'hasNumber'].map((item) => {
+                const status = passwordStrength(formData.password)[item];
+                const text = item === 'minLength' ? '8+ characters' : item === 'hasUpper' ? 'Uppercase' : item === 'hasLower' ? 'Lowercase' : 'Number';
+                return (
+                  <div key={item} className={`px-2 py-1 rounded ${status ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                    {text}
+                  </div>
+                );
+              })}
             </div>
             <div className="relative">
               <select
