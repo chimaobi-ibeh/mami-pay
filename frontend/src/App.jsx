@@ -15,6 +15,7 @@ import PayVendor from './pages/PayVendor';
 import VendorDirectory from './pages/VendorDirectory';
 import Analytics from './pages/Analytics';
 import Profile from './pages/Profile';
+import Settings from './pages/Settings';
 import VendorOnboard from './pages/VendorOnboard';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -99,6 +100,11 @@ const App = () => {
         <Route path="/profile" element={
           <ProtectedRoute user={user} onLogout={logout}>
             <Profile user={user} onProfileUpdate={handleProfileUpdate} />
+          </ProtectedRoute>
+        } />
+        <Route path="/settings" element={
+          <ProtectedRoute user={user} onLogout={logout}>
+            <Settings user={user} />
           </ProtectedRoute>
         } />
 

@@ -112,7 +112,7 @@ const Navbar = ({ user, onLogout }) => {
                     Profile
                   </Link>
                   <Link
-                    to="/profile"
+                    to="/settings"
                     onClick={() => setDropdownOpen(false)}
                     className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                   >
